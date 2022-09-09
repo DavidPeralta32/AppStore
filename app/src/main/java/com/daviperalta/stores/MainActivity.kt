@@ -7,7 +7,7 @@ import com.daviperalta.stores.databinding.ActivityMainBinding
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class MainActivity : AppCompatActivity(), OnClickListener {
+class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     private lateinit var mBinding:ActivityMainBinding
 
     private lateinit var mAdapter: StoreAdapter
@@ -18,19 +18,38 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
 
-        mBinding.btnSave.setOnClickListener {
-            val store = StoreEntity(name = mBinding.etName.text.toString().trim())
+//        mBinding.btnSave.setOnClickListener {
+//            val store = StoreEntity(name = mBinding.etName.text.toString().trim())
+//
+//            Thread{
+//                StoreApplication.dataBase.storeDao().addStore(store)
+//            }.start()
+//
+//
+//            mAdapter.add(store)
+//        }
 
-            Thread{
-                StoreApplication.dataBase.storeDao().addStore(store)
-            }.start()
-
-
-            mAdapter.add(store)
+        mBinding.fab.setOnClickListener {
+            launchEditFragment()
         }
 
         setupRecyclerView()
 
+    }
+
+    private fun launchEditFragment(args : Bundle? = null) {
+        val fragment = EditStoreFragment()
+
+        if(args != null) fragment.arguments = args
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        fragmentTransaction.add(R.id.containerMain, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
+
+        hideFab(false)
     }
 
     private fun setupRecyclerView() {
@@ -57,8 +76,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     /*
     * OnClickListener
     * */
-    override fun onClick(storeEntity: StoreEntity) {
+    override fun onClick(storeId : Long) {
+        val args = Bundle()
+        args.putLong(getString(R.string.arg_id), storeId)
 
+        launchEditFragment(args)
     }
 
     override fun onFavoriteStore(storeEntity: StoreEntity) {
@@ -78,6 +100,21 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 mAdapter.delete(storeEntity)
             }
         }
+
+    }
+
+    /*
+    * MainAux
+    */
+    override fun hideFab(isVisible: Boolean) {
+        if(isVisible) mBinding.fab.show() else mBinding.fab.hide()
+    }
+
+    override fun addStore(storeEntity: StoreEntity) {
+        mAdapter.add(storeEntity)
+    }
+
+    override fun updateStore(storeEntity: StoreEntity) {
 
     }
 }

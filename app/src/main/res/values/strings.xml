@@ -8,4 +8,9 @@
     <string name="helper_require">requerido</string>
     <string name="hint_phone">Telefono</string>
     <string name="hint_web">Pagina web</string>
+    <string name="hint_photo">URL de la imagen</string>
+    <string name="edit_store_title_add">Crear tienda</string>
+    <string name="menu_save">Save</string>
+    <string name="edit_store_message_save_succes">Tienda agregada correctamente</string>
+    <string name="arg_id">key_id</string>
 </resources>

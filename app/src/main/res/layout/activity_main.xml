@@ -8,26 +8,26 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_margin="@dimen/common_padding_default"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/btnSave"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Save"-->
+<!--        android:layout_margin="@dimen/common_padding_default"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <EditText
-        android:id="@+id/etName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/common_padding_default"
-        android:hint="Nombre de la Tienda"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnSave"
-        app:layout_constraintTop_toTopOf="@id/btnSave"
-        app:layout_constraintBottom_toBottomOf="@id/btnSave"
-        />
+<!--    <EditText-->
+<!--        android:id="@+id/etName"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="@dimen/common_padding_default"-->
+<!--        android:hint="Nombre de la Tienda"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/btnSave"-->
+<!--        app:layout_constraintTop_toTopOf="@id/btnSave"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/btnSave"-->
+<!--        />-->
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -35,10 +35,9 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         tools:listitem="@layout/item_store"
-        android:layout_marginTop="@dimen/common_padding_default"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnSave"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
