@@ -1,9 +1,15 @@
 package com.daviperalta.stores
 
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.daviperalta.stores.databinding.ActivityMainBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -17,17 +23,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
-
-//        mBinding.btnSave.setOnClickListener {
-//            val store = StoreEntity(name = mBinding.etName.text.toString().trim())
-//
-//            Thread{
-//                StoreApplication.dataBase.storeDao().addStore(store)
-//            }.start()
-//
-//
-//            mAdapter.add(store)
-//        }
 
         mBinding.fab.setOnClickListener {
             launchEditFragment()
@@ -88,17 +83,61 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
         doAsync {
             StoreApplication.dataBase.storeDao().updateStore(storeEntity)
             uiThread {
-                mAdapter.update(storeEntity)
+                updateStore(storeEntity)
             }
         }
     }
 
     override fun onDeleteStore(storeEntity: StoreEntity) {
-        doAsync {
-            StoreApplication.dataBase.storeDao().deleteStore(storeEntity)
-            uiThread {
-                mAdapter.delete(storeEntity)
+        val items = arrayOf("eliminar", "Llamar", "Ir al sitio web")
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_option_title)
+            .setItems(items,{ dialogInterface, i ->
+                when(i){
+                    0 -> confirmDelete(storeEntity)
+
+                    1-> dial(storeEntity.phone)
+
+                    2-> goToWebSite(storeEntity.website)
+                }
+            })
+            .show()
+    }
+
+    private fun confirmDelete(storeEntity: StoreEntity){
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_delete_title)
+            .setPositiveButton(R.string.dialog_delete_confirm, DialogInterface.OnClickListener { dialog, i->
+                doAsync {
+                    StoreApplication.dataBase.storeDao().deleteStore(storeEntity)
+                    uiThread {
+                        mAdapter.delete(storeEntity)
+                    }
+                }
+            })
+            .setNegativeButton(R.string.dialog_delete_cancel, null)
+            .show()
+    }
+
+    //Llamar a un telefono.
+    private fun dial(phone: String){
+        val callIntent = Intent().apply {
+            action = Intent.ACTION_DIAL
+            data = Uri.parse("tel:$phone")
+        }
+        startActivity(callIntent)
+    }
+
+    private fun goToWebSite(website: String){
+        if(website.isEmpty() || !URLUtil.isValidUrl(website)){
+            Toast.makeText(this, R.string.main_error_no_website, Toast.LENGTH_LONG).show()
+        }else{
+            val websiteIntent = Intent().apply {
+                action = Intent.ACTION_VIEW
+                data = Uri.parse(website)
             }
+            startActivity(websiteIntent)
         }
 
     }
@@ -115,6 +154,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
     }
 
     override fun updateStore(storeEntity: StoreEntity) {
-
+        mAdapter.update(storeEntity)
     }
 }

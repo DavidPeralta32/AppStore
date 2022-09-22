@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.daviperalta.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -20,6 +21,9 @@ class EditStoreFragment : Fragment() {
 
     private lateinit var mBinding: FragmentEditStoreBinding
     private var mActivity : MainActivity? = null
+
+    private var mIsEditMode : Boolean = false
+    private var mStoreEntity: StoreEntity? =  null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mBinding = FragmentEditStoreBinding.inflate(inflater, container,false)
@@ -33,23 +37,66 @@ class EditStoreFragment : Fragment() {
 
         val id = arguments?.getLong(getString(R.string.arg_id) , 0)
         if(id != null && id != 0L){
-            Toast.makeText(activity,id.toString(), Toast.LENGTH_SHORT).show()
+            mIsEditMode = true
+            getStore(id)
         }else{
-            Toast.makeText(activity,id.toString(), Toast.LENGTH_SHORT).show()
+            mIsEditMode = false
+            mStoreEntity = StoreEntity(name = "", phone = "", photoUrl = "")
         }
 
+        setupActionBar()
+
+        setupTextFields()
+    }
+
+    private fun setupActionBar() {
         mActivity = activity as? MainActivity
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        mActivity?.supportActionBar?.title = getString(R.string.edit_store_title_add)
+        mActivity?.supportActionBar?.title = if(mIsEditMode) getString(R.string.edit_store_title_add)
+        else getString(R.string.edit_store_title_edit)
 
         setHasOptionsMenu(true)
-        mBinding.etPhotoUrl.addTextChangedListener{
-            Glide.with(this)
-                .load(mBinding.etPhotoUrl.text.toString())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
-                .into(mBinding.imgPhoto)
+    }
+
+    private fun setupTextFields() {
+        //si el usuario agrega un cambio cunado este en require se pasa a okey
+        with(mBinding){
+            etName.addTextChangedListener { validateFields(tilName) }
+            etPhone.addTextChangedListener { validateFields(tilPhone) }
+            etPhotoUrl.addTextChangedListener {
+                validateFields(tilPhotoUrl)
+                loadImage(it.toString().trim())
+            }
         }
+    }
+
+    private fun loadImage(url: String){
+        Glide.with(this)
+            .load(url)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerCrop()
+            .into(mBinding.imgPhoto)
+    }
+
+    private fun getStore(id: Long) {
+        doAsync {
+            mStoreEntity = StoreApplication.dataBase.storeDao().getStoreById(id)
+            uiThread {
+                if(mStoreEntity != null){
+                    setUIStore(mStoreEntity!!)
+                }
+            }
+        }
+    }
+
+    private fun setUIStore(storeEntity: StoreEntity) {
+            with(mBinding){
+                etName.setText(storeEntity.name)
+                etPhone.setText(storeEntity.phone)
+                etWebsite.setText(storeEntity.website)
+                etPhotoUrl.setText(storeEntity.photoUrl)
+
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -66,20 +113,39 @@ class EditStoreFragment : Fragment() {
                 true
             }
             R.id.action_save ->{
-                val sName = mBinding.etName.text.toString().trim()
-                val sPhone = mBinding.etPhone.text.toString().trim()
-                val sWebSite = mBinding.etWebsite.text.toString().trim()
-                val sPhotoUrl = mBinding.etPhotoUrl.text.toString().trim()
-                val store =  StoreEntity(name = sName, phone = sPhone,website = sWebSite, photoUrl = sPhotoUrl)
-                doAsync {
-                    store.id = StoreApplication.dataBase.storeDao().addStore(store)
+                if(mStoreEntity != null && validateFields(mBinding.tilPhotoUrl, mBinding.tilPhone,mBinding.tilName)){
+                    //                val store =  StoreEntity(name = sName, phone = sPhone,website = sWebSite, photoUrl = sPhotoUrl)
+                    with(mStoreEntity!!){
+                        name = mBinding.etName.text.toString().trim()
+                        phone = mBinding.etPhone.text.toString().trim()
+                        website = mBinding.etWebsite.text.toString().trim()
+                        photoUrl = mBinding.etPhotoUrl.text.toString().trim()
+                    }
+                    doAsync {
+                        if(mIsEditMode){
+                            StoreApplication.dataBase.storeDao().updateStore(mStoreEntity!!)
+                        }else{
+                            mStoreEntity!!.id = StoreApplication.dataBase.storeDao().addStore(mStoreEntity!!)
+                        }
+                        uiThread {
 
-                    uiThread {
-                        mActivity?.addStore(store)
-                        hideKeyboard()
-                        Toast.makeText(mActivity,R.string.edit_store_message_save_succes, Toast.LENGTH_SHORT).show()
+                            hideKeyboard()
 
-                        mActivity?.onBackPressed()
+                            if(mIsEditMode){
+                                mActivity?.updateStore(mStoreEntity!!)
+
+                                Snackbar.make(mBinding.root,R.string.edit_store_message_update_succes, Snackbar.LENGTH_SHORT)
+                            }else {
+                                mActivity?.addStore(mStoreEntity!!)
+                                Toast.makeText(
+                                    mActivity,
+                                    R.string.edit_store_message_save_succes,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                mActivity?.onBackPressed()
+                            }
+                        }
                     }
                 }
                 true
@@ -87,6 +153,40 @@ class EditStoreFragment : Fragment() {
             else ->return super.onOptionsItemSelected(item)
         }
 
+    }
+
+    private fun validateFields(vararg textFields: TextInputLayout): Boolean{
+        var isValid = true
+        for (textField in textFields){
+            if (textField.editText?.text.toString().trim().isEmpty()){
+                textField.error = getString(R.string.helper_require)
+                textField.editText?.requestFocus()
+                isValid = false
+            }else textField.error = null
+        }
+        if(!isValid) Snackbar.make(mBinding.root, R.string.edit_message_valid, Snackbar.LENGTH_SHORT).show()
+        return isValid
+    }
+
+    private fun validateFields(): Boolean {
+        var isValid = true
+        if(mBinding.etPhotoUrl.text.toString().trim().isEmpty()){
+            mBinding.tilPhotoUrl.error = getString(R.string.helper_require)
+            mBinding.etPhotoUrl.requestFocus()
+            isValid = false
+        }
+        if(mBinding.etPhone.text.toString().trim().isEmpty()){
+            mBinding.tilPhone.error = getString(R.string.helper_require)
+            mBinding.etPhone.requestFocus()
+            isValid = false
+        }
+        if(mBinding.etName.text.toString().trim().isEmpty()){
+            mBinding.tilName.error = getString(R.string.helper_require)
+            mBinding.etName.requestFocus()
+            isValid = false
+        }
+
+        return isValid
     }
 
     private fun hideKeyboard(){

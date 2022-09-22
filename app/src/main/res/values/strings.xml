@@ -13,4 +13,12 @@
     <string name="menu_save">Save</string>
     <string name="edit_store_message_save_succes">Tienda agregada correctamente</string>
     <string name="arg_id">key_id</string>
+    <string name="edit_store_message_update_succes">Tienda actualizada</string>
+    <string name="edit_message_valid">Revise los campos requeridos</string>
+    <string name="edit_store_title_edit">Editar tienda</string>
+    <string name="dialog_delete_title">Eliminar Tienda</string>
+    <string name="dialog_delete_confirm">Eliminar</string>
+    <string name="dialog_delete_cancel">Cancelar</string>
+    <string name="dialog_option_title">¿Que desea hacer?</string>
+    <string name="main_error_no_website">No cuanta con un sitio web</string>
 </resources>
