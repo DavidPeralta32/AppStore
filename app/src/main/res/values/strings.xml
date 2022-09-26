@@ -1,24 +1,25 @@
 <resources>
-    <string name="app_name">Tiendas</string>
+    <string name="app_name">Stores</string>
     <string name="description_img_photo">Imagen de la Tienda</string>
-    <string name="description_store_add">Crear tienda</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="hint_name">Nombre de la tienda</string>
-    <string name="helper_require">requerido</string>
-    <string name="hint_phone">Telefono</string>
-    <string name="hint_web">Pagina web</string>
-    <string name="hint_photo">URL de la imagen</string>
-    <string name="edit_store_title_add">Crear tienda</string>
+    <string name="description_store_add">new Store</string>
+    <string name="hint_name">Name´s store</string>
+    <string name="helper_require">Required</string>
+    <string name="hint_phone">Phone</string>
+    <string name="hint_web">Web site</string>
+    <string name="hint_photo">URL image</string>
+    <string name="edit_store_title_add">Create store</string>
     <string name="menu_save">Save</string>
-    <string name="edit_store_message_save_succes">Tienda agregada correctamente</string>
-    <string name="arg_id">key_id</string>
+    <string name="edit_store_message_save_succes">Store create succes</string>
+    <string name="arg_id" translatable="false">key_id</string>
     <string name="edit_store_message_update_succes">Tienda actualizada</string>
     <string name="edit_message_valid">Revise los campos requeridos</string>
-    <string name="edit_store_title_edit">Editar tienda</string>
-    <string name="dialog_delete_title">Eliminar Tienda</string>
-    <string name="dialog_delete_confirm">Eliminar</string>
-    <string name="dialog_delete_cancel">Cancelar</string>
-    <string name="dialog_option_title">¿Que desea hacer?</string>
+    <string name="edit_store_title_edit">Update Store</string>
+    <string name="dialog_delete_title">Delete Store</string>
+    <string name="dialog_delete_confirm">Delete</string>
+    <string name="dialog_Llamar">To call</string>
+    <string name="dialog_sitio_web">Go to Web site</string>
+    <string name="dialog_delete_cancel">Cancel</string>
+    <string name="dialog_option_title">¿What would you like to do?</string>
     <string name="main_error_no_website">No cuanta con un sitio web</string>
+    <string name="main_error_no_resolve">No se encontro ninguna APP compatible</string>
 </resources>
